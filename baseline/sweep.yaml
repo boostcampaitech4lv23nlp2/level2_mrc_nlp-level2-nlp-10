@@ -1,0 +1,24 @@
+program: train.py
+entity: boost2end
+project: MRC_Baseline
+name: temp
+
+method: random
+metric:
+  name: train_loss
+  goal: minimize
+parameters:
+  learning_rate:
+    max: 0.00001
+    min: 0.00000001
+  epochs:
+    value: 3
+  
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - "--output_dir"
+  - "outputs"
+  - "--do_train"
+  - "True"
