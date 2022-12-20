@@ -1,1 +1,13 @@
 omegaconf==2.2.3
+black==22.10.0
+datasets==2.7.1
+faiss-gpu==1.7.2
+flake8==5.0.4
+isort==5.10.1
+pip-chill==1.0.1
+pre-commit==2.17.0
+pytest==7.0.1
+scikit-learn==1.2.0
+torch==1.13.0
+transformers==4.25.1
+wandb==0.13.7
