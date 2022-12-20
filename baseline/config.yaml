@@ -1,14 +1,22 @@
 path:
-  train_path: ../data/train_dataset/train
-  dev_path: ../data/train_dataset/validation
-  test_path: ../data/test_dataset/validation
+  train_path: ../data/train_dataset
+  dev_path: ../data/train_dataset
+  test_path: ../data/test_dataset
 
 data:
   shuffle: True
+  max_seq_length: 384
+  pad_to_max_length: False
+  doc_stride: 128
+  max_answer_length: 30
+  eval_retrieval: True
+  num_clusters: 64
+  top_k_retrieval: 10
+  use_faiss: False
 
-  model:
-    model_name: klue/roberta-small
-    saved_name: base_model
+model:
+  model_name: klue/bert-base
+  saved_name: base_model
 
 train:
   seed: 42
@@ -16,10 +24,13 @@ train:
   batch_size: 16
   max_epoch: 1
   learning_rate: 1e-5
-  logging_step: 1 
+  logging_steps: 500
 
 wandb:
   use: True
   entity: boost2end
   project: MRC_Baseline
   run_name: temp
+
+cmd:
+  overwrite_output_dir: True
