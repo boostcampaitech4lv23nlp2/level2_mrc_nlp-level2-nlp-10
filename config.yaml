@@ -1,7 +1,5 @@
 path:
   train_path: ../data/train_dataset
-  dev_path: ../data/train_dataset
-  test_path: ../data/test_dataset
 
 data:
   shuffle: True
@@ -16,7 +14,6 @@ data:
 
 model:
   model_name: klue/bert-base
-  saved_name: base_model
 
 train:
   seed: 42
@@ -27,7 +24,7 @@ train:
   logging_steps: 500
 
 wandb:
-  use: True
+  use: False
   entity: boost2end
   project: MRC_Baseline
   run_name: temp

@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 
+import omegaconf
 import wandb
 from arguments import DataTrainingArguments, ModelArguments
 from datasets import DatasetDict, load_from_disk, load_metric
@@ -27,7 +28,7 @@ logger = logging.getLogger(__name__)
 def main():
     # 가능한 arguments 들은 ./arguments.py 나 transformer package 안의 src/transformers/training_args.py 에서 확인 가능합니다.
     # --help flag 를 실행시켜서 확인할 수 도 있습니다.
-    conf = OmegaConf.load("./config.yaml")
+    conf = OmegaConf.load("../config.yaml")
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
@@ -45,8 +46,6 @@ def main():
 
     # output_dir이 차있어도 덮어쓰게 합니다.
     training_args.overwrite_output_dir = conf.cmd.overwrite_output_dir
-
-    model_args.model_name_or_path = conf.model.model_name
 
     # [참고] argument를 manual하게 수정하고 싶은 경우에 아래와 같은 방식을 사용할 수 있습니다
     # training_args.per_device_train_batch_size = 4
@@ -349,7 +348,22 @@ def run_mrc(
         trainer.save_metrics("eval", metrics)
 
 
-def set_args_by_config(model_args, data_args, training_args, conf):
+def set_args_by_config(
+    model_args: ModelArguments,
+    data_args: DataTrainingArguments,
+    training_args: TrainingArguments,
+    conf: omegaconf.dictconfig.DictConfig,
+):
+    """set_args_by_config() 함수
+
+    사용자가 config.yaml 파일에 입력한 내용을 토대로 기존 baseline 코드에서 사용하던 argument들을 재설정합니다.
+
+    Args:
+        model_args (ModelArguments): dataclass인 ModelArguments
+        data_args (DataTrainingArguments): dataclass인 DataTrainingArguments
+        training_args (TrainingArguments): dataclass인 TrainingArguments
+        conf (omegaconf.dictconfig.DictConfig): config.yaml파일의 정보가 담긴 DictConfig
+    """
     # model
     model_args.model_name_or_path = conf.model.model_name
 
