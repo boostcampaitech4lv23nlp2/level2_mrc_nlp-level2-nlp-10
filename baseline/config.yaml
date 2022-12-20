@@ -8,7 +8,7 @@ data:
 
   model:
     model_name: klue/roberta-small
-    saved_name: abse_model
+    saved_name: base_model
 
 train:
   seed: 42
@@ -17,4 +17,9 @@ train:
   max_epoch: 1
   learning_rate: 1e-5
   logging_step: 1 
-  wandb: True
+
+wandb:
+  use: True
+  entity: boost2end
+  project: MRC_Baseline
+  run_name: temp
