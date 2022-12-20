@@ -1,0 +1,20 @@
+path:
+  train_path: ../data/train_dataset/train
+  dev_path: ../data/train_dataset/validation
+  test_path: ../data/test_dataset/validation
+
+data:
+  shuffle: True
+
+  model:
+    model_name: klue/roberta-small
+    saved_name: abse_model
+
+train:
+  seed: 42
+  gpus: 1
+  batch_size: 16
+  max_epoch: 1
+  learning_rate: 1e-5
+  logging_step: 1 
+  wandb: True
