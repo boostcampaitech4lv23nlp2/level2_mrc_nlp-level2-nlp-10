@@ -382,6 +382,8 @@ def set_args_by_config(
     training_args.learning_rate = conf.learning_rate
     training_args.logging_steps = conf.logging_steps
 
+    training_args.evaluation_strategy = conf.evaluation_strategy
+
 
 if __name__ == "__main__":
     main()
