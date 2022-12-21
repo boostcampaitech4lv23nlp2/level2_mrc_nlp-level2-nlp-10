@@ -13,21 +13,21 @@ top_k_retrieval: 10
 use_faiss: False
 
 # model
-model_name: klue/bert-base
+model_name: klue/roberta-base
 
 # train
 seed: 42
 gpus: 1
-batch_size: 16
-max_epoch: 3
-learning_rate: 1e-5
-logging_steps: 500
+batch_size: 8
+max_epoch: 10
+learning_rate: 5e-5
+logging_steps: 1
 
 # wandb
 wandb_use: True
 entity: boost2end
-project: MRC_Baseline
-run_name: base
+project: MRC_backbone
+run_name: klue/roberta-base
 
 # cmd
 overwrite_output_dir: True
