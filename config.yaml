@@ -13,7 +13,7 @@ top_k_retrieval: 10
 use_faiss: False
 
 # model
-model_name: klue/bert-base
+model_name: klue/roberta-base
 
 # train
 seed: 42
@@ -22,14 +22,14 @@ batch_size: 8
 max_epoch: 10
 learning_rate: 5e-5
 logging_steps: 1
-evaluation_strategy: steps
+evaluation_strategy: epoch
 eval_steps: 1
 
 # wandb
 wandb_use: True
 entity: boost2end
 project: MRC_backbone
-run_name: eval_strategy
+run_name: klue/roberta-base
 
 
 # cmd
