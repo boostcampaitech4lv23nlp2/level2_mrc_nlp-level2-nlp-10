@@ -1,18 +1,22 @@
-program: train.py
+program: train_sweep.py
 entity: boost2end
 project: MRC_Baseline
-name: temp
+name: sweep
 
 method: random
+
 metric:
   name: train_loss
   goal: minimize
+
 parameters:
   learning_rate:
     max: 0.00001
     min: 0.00000001
-  epochs:
+  max_epoch:
     value: 3
+  seed:
+    values: [42, 59, 100]
   
 command:
   - ${env}

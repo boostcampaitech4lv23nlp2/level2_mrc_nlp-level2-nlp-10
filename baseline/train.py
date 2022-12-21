@@ -33,19 +33,16 @@ def main():
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # wandb를 세팅합니다.
-    if conf.wandb.use:
+    if conf.wandb_use:
         wandb.login()
         wandb.init(
-            project=conf.wandb.project,
-            entity=conf.wandb.entity,
-            name=conf.wandb.run_name,
+            project=conf.project,
+            entity=conf.entity,
+            name=conf.run_name,
         )
 
     # config.yaml에 맞게 args들의 값을 변경합니다.
     set_args_by_config(model_args, data_args, training_args, conf)
-
-    # output_dir이 차있어도 덮어쓰게 합니다.
-    training_args.overwrite_output_dir = conf.cmd.overwrite_output_dir
 
     # [참고] argument를 manual하게 수정하고 싶은 경우에 아래와 같은 방식을 사용할 수 있습니다
     # training_args.per_device_train_batch_size = 4
@@ -365,28 +362,28 @@ def set_args_by_config(
         conf (omegaconf.dictconfig.DictConfig): config.yaml파일의 정보가 담긴 DictConfig
     """
     # model
-    model_args.model_name_or_path = conf.model.model_name
+    model_args.model_name_or_path = conf.model_name
 
     # data
-    data_args.dataset_name = conf.path.train_path
-    data_args.max_seq_length = conf.data.max_seq_length
-    data_args.pad_to_max_length = conf.data.pad_to_max_length
-    data_args.doc_stride = conf.data.doc_stride
-    data_args.max_answer_length = conf.data.max_answer_length
-    data_args.eval_retrieval = conf.data.eval_retrieval
-    data_args.num_clusters = conf.data.num_clusters
-    data_args.top_k_retrieval = conf.data.top_k_retrieval
-    data_args.use_faiss = conf.data.use_faiss
+    data_args.dataset_name = conf.train_path
+    data_args.max_seq_length = conf.max_seq_length
+    data_args.pad_to_max_length = conf.pad_to_max_length
+    data_args.doc_stride = conf.doc_stride
+    data_args.max_answer_length = conf.max_answer_length
+    data_args.eval_retrieval = conf.eval_retrieval
+    data_args.num_clusters = conf.num_clusters
+    data_args.top_k_retrieval = conf.top_k_retrieval
+    data_args.use_faiss = conf.use_faiss
 
     # train
-    training_args.overwrite_output_dir = conf.cmd.overwrite_output_dir
-    training_args.seed = conf.train.seed
-    training_args.data_seed = conf.train.seed
-    training_args.per_device_train_batch_size = conf.train.batch_size
-    training_args.per_device_eval_batch_size = conf.train.batch_size
-    training_args.num_train_epochs = conf.train.max_epoch
-    training_args.learning_rate = conf.train.learning_rate
-    training_args.logging_steps = conf.train.logging_steps
+    training_args.overwrite_output_dir = conf.overwrite_output_dir
+    training_args.seed = conf.seed
+    training_args.data_seed = conf.seed
+    training_args.per_device_train_batch_size = conf.batch_size
+    training_args.per_device_eval_batch_size = conf.batch_size
+    training_args.num_train_epochs = conf.max_epoch
+    training_args.learning_rate = conf.learning_rate
+    training_args.logging_steps = conf.logging_steps
 
 
 if __name__ == "__main__":

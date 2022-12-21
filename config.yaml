@@ -1,33 +1,33 @@
-path:
-  train_path: ../data/train_dataset
+# path
+train_path: ../data/train_dataset
 
-data:
-  shuffle: True
-  max_seq_length: 384
-  pad_to_max_length: False
-  doc_stride: 128
-  max_answer_length: 30
-  eval_retrieval: True
-  num_clusters: 64
-  top_k_retrieval: 10
-  use_faiss: False
+# data
+shuffle: True
+max_seq_length: 384
+pad_to_max_length: False
+doc_stride: 128
+max_answer_length: 30
+eval_retrieval: True
+num_clusters: 64
+top_k_retrieval: 10
+use_faiss: False
 
-model:
-  model_name: klue/bert-base
+# model
+model_name: klue/bert-base
 
-train:
-  seed: 42
-  gpus: 1
-  batch_size: 16
-  max_epoch: 1
-  learning_rate: 1e-5
-  logging_steps: 500
+# train
+seed: 42
+gpus: 1
+batch_size: 16
+max_epoch: 3
+learning_rate: 1e-5
+logging_steps: 500
 
-wandb:
-  use: False
-  entity: boost2end
-  project: MRC_Baseline
-  run_name: temp
+# wandb
+wandb_use: True
+entity: boost2end
+project: MRC_Baseline
+run_name: base
 
-cmd:
-  overwrite_output_dir: True
+# cmd
+overwrite_output_dir: True
