@@ -172,7 +172,7 @@ def run_mrc(
             stride=data_args.doc_stride,
             return_overflowing_tokens=True,
             return_offsets_mapping=True,
-            # return_token_type_ids=False, # roberta모델을 사용할 경우 False, bert를 사용할 경우 True로 표기해야합니다.
+            return_token_type_ids=False,  # roberta모델을 사용할 경우 False, bert를 사용할 경우 True로 표기해야합니다.
             padding="max_length" if data_args.pad_to_max_length else False,
         )
 
@@ -263,7 +263,7 @@ def run_mrc(
 
     # eval dataset & eval example - predictions.json 생성됨
     if training_args.do_predict:
-        # predictions = trainer.predict(test_dataset=eval_dataset, test_examples=datasets["validation"])
+        trainer.predict(test_dataset=eval_dataset, test_examples=datasets["validation"])
 
         # predictions.json 은 postprocess_qa_predictions() 호출시 이미 저장됩니다.
         print("No metric can be presented because there is no correct answer given. Job done!")
