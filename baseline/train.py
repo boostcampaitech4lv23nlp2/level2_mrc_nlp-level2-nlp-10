@@ -387,6 +387,7 @@ def set_args_by_config(
 
     training_args.eval_steps = conf.eval_steps
     training_args.evaluation_strategy = conf.evaluation_strategy
+    training_args.save_total_limit = conf.save_total_limit
 
 
 if __name__ == "__main__":
