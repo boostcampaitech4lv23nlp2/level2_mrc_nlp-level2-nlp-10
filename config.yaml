@@ -3,7 +3,6 @@ model:
 
 dataset:
   dataset_name: ../data/train_dataset
-  test_path: ../data/test_dataset
   max_seq_length: 384
   pad_to_max_length: False
   doc_stride: 128
@@ -25,9 +24,14 @@ train:
   eval_steps: 1
   evaluation_strategy: epoch
   save_total_limit: 3
+  metric_for_best_model: exact_match
+  load_best_model_at_end: True
 
 wandb:
   use: False
   entity: boost2end
   project: MRC_learning_rate
   run_name: klue/roberta-large
+
+others:
+  test_path: ../data/test_path
