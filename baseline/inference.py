@@ -39,7 +39,7 @@ def main():
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # dataset_name을 test_path로 바꿔줍니다.
-    data_args.datset_name = conf.test_path
+    data_args.datset_name = conf.others.test_path
 
     training_args.do_train = True
 
