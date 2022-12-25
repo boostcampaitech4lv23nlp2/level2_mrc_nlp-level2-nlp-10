@@ -1,0 +1,37 @@
+# path
+train_path: ../data/train_dataset
+
+# data
+shuffle: True
+max_seq_length: 384
+pad_to_max_length: False
+doc_stride: 128
+max_answer_length: 30
+eval_retrieval: True
+num_clusters: 64
+top_k_retrieval: 10
+use_faiss: False
+
+# model
+model_name: klue/roberta-large
+
+# train
+seed: 42
+gpus: 1
+batch_size: 4
+max_epoch: 10
+learning_rate: 5e-5
+logging_steps: 1
+evaluation_strategy: epoch
+eval_steps: 1
+save_total_limit: 3
+
+# wandb
+wandb_use: True
+entity: boost2end
+project: MRC_batch-size
+run_name: klue/roberta-large_4batch
+
+
+# cmd
+overwrite_output_dir: True
