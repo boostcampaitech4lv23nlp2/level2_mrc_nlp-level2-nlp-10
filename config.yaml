@@ -18,7 +18,7 @@ train:
   overwrite_output_dir: True
   per_device_train_batch_size: 8
   per_device_eval_batch_size: 8
-  num_train_epochs: 5
+  num_train_epochs: 1
   learning_rate: 5e-5
   logging_steps: 1
   eval_steps: 1
@@ -26,11 +26,12 @@ train:
   save_total_limit: 3
   metric_for_best_model: exact_match
   load_best_model_at_end: True
+  save_strategy: epoch
 
 wandb:
-  use: False
+  use: True
   entity: boost2end
-  project: MRC_learning_rate
+  project: temp
   run_name: klue/roberta-large
 
 others:
