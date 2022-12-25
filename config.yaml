@@ -3,6 +3,7 @@ model:
 
 dataset:
   dataset_name: ../data/train_dataset
+  test_path: ../data/test_dataset
   max_seq_length: 384
   pad_to_max_length: False
   doc_stride: 128

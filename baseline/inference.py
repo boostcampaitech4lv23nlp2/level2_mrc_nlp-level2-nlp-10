@@ -13,6 +13,7 @@ import sys
 import numpy as np
 from arguments import DataTrainingArguments, ModelArguments
 from datasets import Dataset, DatasetDict, Features, Sequence, Value, load_from_disk, load_metric
+from omegaconf import OmegaConf
 from retrieval import SparseRetrieval
 from trainer_qa import QuestionAnsweringTrainer
 from transformers import (
@@ -33,9 +34,12 @@ logger = logging.getLogger(__name__)
 def main():
     # 가능한 arguments 들은 ./arguments.py 나 transformer package 안의 src/transformers/training_args.py 에서 확인 가능합니다.
     # --help flag 를 실행시켜서 확인할 수 도 있습니다.
-
+    conf = OmegaConf.load("../config.yaml")
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+
+    # dataset_name을 test_path로 바꿔줍니다.
+    data_args.datset_name = conf.test_path
 
     training_args.do_train = True
 
