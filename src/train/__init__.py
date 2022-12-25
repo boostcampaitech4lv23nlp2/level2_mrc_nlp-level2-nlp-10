@@ -1,1 +1,5 @@
-from train.train import train  # noqa: F401
+from train.train import train
+
+__all__ = [
+    "train",
+]
