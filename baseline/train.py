@@ -43,7 +43,7 @@ def main():
         )
 
     # config.yaml에 맞게 args들의 값을 변경합니다.
-    set_args_by_config(model_args, data_args, training_args, conf)
+    model_args, data_args, training_args = set_args_by_config(model_args, data_args, training_args, conf)
 
     # [참고] argument를 manual하게 수정하고 싶은 경우에 아래와 같은 방식을 사용할 수 있습니다
     # training_args.per_device_train_batch_size = 4
@@ -352,9 +352,11 @@ def set_args_by_config(
     training_args: TrainingArguments,
     conf: omegaconf.dictconfig.DictConfig,
 ):
-    model_args = dataclasses.replace(model_args, **conf.model)
-    data_args = dataclasses.replace(data_args, **conf.dataset)
-    training_args = dataclasses.replace(training_args, **conf.train)
+    new_model_args = dataclasses.replace(model_args, **conf.model)
+    new_data_args = dataclasses.replace(data_args, **conf.dataset)
+    new_training_args = dataclasses.replace(training_args, **conf.train)
+
+    return (new_model_args, new_data_args, new_training_args)
 
 
 if __name__ == "__main__":
