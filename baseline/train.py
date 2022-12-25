@@ -1,5 +1,6 @@
 from typing import NoReturn
 
+import dataclasses
 import logging
 import os
 import sys
@@ -33,12 +34,12 @@ def main():
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
     # wandb를 세팅합니다.
-    if conf.wandb_use:
+    if conf.wandb.use:
         wandb.login()
         wandb.init(
-            project=conf.project,
-            entity=conf.entity,
-            name=conf.run_name,
+            project=conf.wandb.project,
+            entity=conf.wandb.entity,
+            name=conf.wandb.run_name,
         )
 
     # config.yaml에 맞게 args들의 값을 변경합니다.
@@ -351,43 +352,9 @@ def set_args_by_config(
     training_args: TrainingArguments,
     conf: omegaconf.dictconfig.DictConfig,
 ):
-    """set_args_by_config() 함수
-
-    사용자가 config.yaml 파일에 입력한 내용을 토대로 기존 baseline 코드에서 사용하던 argument들을 재설정합니다.
-
-    Args:
-        model_args (ModelArguments): dataclass인 ModelArguments
-        data_args (DataTrainingArguments): dataclass인 DataTrainingArguments
-        training_args (TrainingArguments): dataclass인 TrainingArguments
-        conf (omegaconf.dictconfig.DictConfig): config.yaml파일의 정보가 담긴 DictConfig
-    """
-    # model
-    model_args.model_name_or_path = conf.model_name
-
-    # data
-    data_args.dataset_name = conf.train_path
-    data_args.max_seq_length = conf.max_seq_length
-    data_args.pad_to_max_length = conf.pad_to_max_length
-    data_args.doc_stride = conf.doc_stride
-    data_args.max_answer_length = conf.max_answer_length
-    data_args.eval_retrieval = conf.eval_retrieval
-    data_args.num_clusters = conf.num_clusters
-    data_args.top_k_retrieval = conf.top_k_retrieval
-    data_args.use_faiss = conf.use_faiss
-
-    # train
-    training_args.overwrite_output_dir = conf.overwrite_output_dir
-    training_args.seed = conf.seed
-    training_args.data_seed = conf.seed
-    training_args.per_device_train_batch_size = conf.batch_size
-    training_args.per_device_eval_batch_size = conf.batch_size
-    training_args.num_train_epochs = conf.max_epoch
-    training_args.learning_rate = conf.learning_rate
-    training_args.logging_steps = conf.logging_steps
-
-    training_args.eval_steps = conf.eval_steps
-    training_args.evaluation_strategy = conf.evaluation_strategy
-    training_args.save_total_limit = conf.save_total_limit
+    model_args = dataclasses.replace(model_args, **conf.model)
+    data_args = dataclasses.replace(data_args, **conf.dataset)
+    training_args = dataclasses.replace(training_args, **conf.train)
 
 
 if __name__ == "__main__":
