@@ -35,4 +35,4 @@ wandb:
   run_name: klue/roberta-large
 
 others:
-  test_path: ../data/test_path
+  test_path: ../data/test_dataset
