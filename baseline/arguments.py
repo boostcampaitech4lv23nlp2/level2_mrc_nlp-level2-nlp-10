@@ -21,6 +21,10 @@ class ModelArguments:
         default=None,
         metadata={"help": "Pretrained tokenizer name or path if not the same as model_name"},
     )
+    do_sweep: Optional[str] = field(
+        default=False,
+        metadata={"help": "Choose to use sweep"},
+    )
 
 
 @dataclass

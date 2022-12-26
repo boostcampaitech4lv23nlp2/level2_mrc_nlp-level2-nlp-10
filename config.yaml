@@ -24,8 +24,8 @@ train:
   eval_steps: 1
   evaluation_strategy: epoch
   save_total_limit: 3
-  metric_for_best_model: exact_match
-  load_best_model_at_end: True
+  #metric_for_best_model: exact_match
+  #load_best_model_at_end: True
   save_strategy: epoch
 
 wandb:
