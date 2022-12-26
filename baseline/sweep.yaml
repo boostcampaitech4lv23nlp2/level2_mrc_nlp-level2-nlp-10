@@ -1,6 +1,6 @@
-program: train_sweep.py
+program: train_gether.py
 entity: boost2end
-project: MRC_Baseline
+project: temp
 name: sweep
 
 method: random
@@ -25,4 +25,8 @@ command:
   - "--output_dir"
   - "outputs"
   - "--do_train"
+  - "True"
+  - "--do_eval"
+  - "True"
+  - "--do_sweep"
   - "True"
