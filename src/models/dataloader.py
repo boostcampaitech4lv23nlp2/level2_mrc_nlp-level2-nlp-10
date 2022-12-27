@@ -1,29 +1,17 @@
 import os
 
 import pytorch_lightning as pl
-from datasets import DatasetDict, load_from_disk
-from torch.utils.data import DataLoader, Dataset
-from torch.utils.data.dataloader import default_collate
-from transformers import AutoTokenizer
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import AutoTokenizer, DataCollatorWithPadding
 
-from utils import print_msg
+from utils import load_data, print_msg
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
-class Dataset(Dataset):
-    def __init__(self, dataset: DatasetDict):
-        self.dataset = dataset
-
-    def __len__(self):
-        return len(self.dataset["input_ids"])
-
-    def __getitem__(self, idx):
-        return self.dataset[idx]
-
-
 class Dataloader(pl.LightningDataModule):
-    def __init__(self, mode, conf):
+    def __init__(self, conf, mode="train"):
         """_summary_
         Args:
             conf (dict): configuration dictionary
@@ -35,21 +23,17 @@ class Dataloader(pl.LightningDataModule):
         self.pad_to_max_length = conf.pad_to_max_length
         self.max_length = conf.max_seq_length
         self.tokenizer = AutoTokenizer.from_pretrained(
-            conf.tokenizer_name, max_length=self.max_length, local_files_only=True
+            conf.model_name, max_length=self.max_length, local_files_only=True
         )
         self.batch_size = conf.batch_size
-
         self.dataset_path = conf.train_path
 
-        self.dataset = None  # train dataset & inference dataset
-        self.val_dataset = None
+        self.train_dataset = None  # train dataset
+        self.val_dataset = None  # validation dataset & predict dataset
         self.dataloader = None
+        self.data_collator = DataCollatorWithPadding(self.tokenizer, pad_to_multiple_of=8)
 
-    def load_data(self) -> DatasetDict:
-        dataset = load_from_disk(self.dataset_path)
-        return dataset
-
-    def preprocessing(self, dataset):
+    def preprocessing(self, raw_dataset):
         def set_features(column_names):
             question_column_name = "question" if "question" in column_names else column_names[0]
             context_column_name = "context" if "context" in column_names else column_names[1]
@@ -62,8 +46,6 @@ class Dataloader(pl.LightningDataModule):
                 context_column_name,
                 answer_column_name,
                 pad_on_right,
-                last_checkpoint,
-                max_seq_length,
             )
             return features
 
@@ -71,13 +53,13 @@ class Dataloader(pl.LightningDataModule):
             tokenized_examples = self.tokenizer(
                 examples[question_column_name if pad_on_right else context_column_name],
                 examples[context_column_name if pad_on_right else question_column_name],
+                padding="max_length" if self.pad_to_max_length else False,
                 truncation="only_second" if pad_on_right else "only_first",
-                max_length=max_seq_length,
+                max_length=self.max_length,
                 stride=self.doc_stride,
                 return_overflowing_tokens=True,
                 return_offsets_mapping=True,
                 return_token_type_ids=False,  # roberta모델을 사용할 경우 False, bert를 사용할 경우 True로 표기해야합니다.
-                padding="max_length" if self.pad_to_max_length else False,
             )
 
             # 길이가 긴 context가 등장할 경우 truncate를 진행해야하므로, 해당 데이터셋을 찾을 수 있도록 mapping 가능한 값이 필요합니다.
@@ -92,7 +74,7 @@ class Dataloader(pl.LightningDataModule):
             tokenized_examples["start_positions"] = []
             tokenized_examples["end_positions"] = []
 
-            for i, offsets in enumerate(offset_mapping):
+            for i, offsets in tqdm(enumerate(offset_mapping)):
                 input_ids = tokenized_examples["input_ids"][i]
                 cls_index = input_ids.index(self.tokenizer.cls_token_id)  # cls index
 
@@ -142,9 +124,10 @@ class Dataloader(pl.LightningDataModule):
             tokenized_examples, sample_mapping = preprocess_common(examples)
             # evaluation을 위해, prediction을 context의 substring으로 변환해야합니다.
             # corresponding example_id를 유지하고 offset mappings을 저장해야합니다.
+
             tokenized_examples["example_id"] = []
 
-            for i in range(len(tokenized_examples["input_ids"])):
+            for i in tqdm(range(len(tokenized_examples["input_ids"]))):
                 # sequence id를 설정합니다 (to know what is the context and what is the question).
                 sequence_ids = tokenized_examples.sequence_ids(i)
                 context_index = 1 if pad_on_right else 0
@@ -161,62 +144,57 @@ class Dataloader(pl.LightningDataModule):
             return tokenized_examples
 
         if self.mode == "train":
-            column_names = dataset["train"].column_names
+            column_names = raw_dataset["train"].column_names
             train_features = set_features(column_names)
             (
                 question_column_name,
                 context_column_name,
                 answer_column_name,
                 pad_on_right,
-                last_checkpoint,
-                max_seq_length,
             ) = train_features
-            train_dataset = dataset["train"].map(
+
+            self.train_dataset = raw_dataset["train"].map(
                 preprocess_for_train,
                 batched=True,
-                num_proc=4,
+                num_proc=1,
                 remove_columns=column_names,
+                desc="Running tokenizer on train dataset",
             )
-            self.train_dataset = Dataset(train_dataset)
 
-        column_names = dataset["validation"].column_names
+        column_names = raw_dataset["validation"].column_names
         val_features = set_features(column_names)
-        (
-            question_column_name,
-            context_column_name,
-            answer_column_name,
-            pad_on_right,
-            last_checkpoint,
-            max_seq_length,
-        ) = val_features
-        val_dataset = dataset["validation"].map(
+        (question_column_name, context_column_name, answer_column_name, pad_on_right) = val_features
+
+        self.val_dataset = raw_dataset["validation"].map(
             preprocess_for_validation,
             batched=True,
-            num_proc=4,
+            num_proc=1,
             remove_columns=column_names,
         )
-        self.val_dataset = Dataset(val_dataset)
 
     def setup(self, stage="fit"):
         if stage == "fit":
             print_msg("Loading Dataset...", "INFO")
-            dataset = self.load_data(self.data_path)
-            self.preprocessing(dataset)
+            raw_dataset = load_data(self.dataset_path)
+            print_msg("Preprocessing Dataset...", "INFO")
+            self.preprocessing(raw_dataset)
+            print_msg("Finish Loading Dataset...", "INFO")
 
     def train_dataloader(self):
         return DataLoader(
-            self.dataset,
+            self.train_dataset,
             batch_size=self.batch_size,
             num_workers=4,
-            collate_fn=default_collate,
+            collate_fn=self.data_collator,
         )
 
     def val_dataloader(self):
+        val_dataset_for_model = self.val_dataset.remove_columns(["example_id", "offset_mapping"])
         return DataLoader(
-            self.val_dataset,
+            val_dataset_for_model,
             batch_size=self.batch_size,
             num_workers=4,
-            collate_fn=default_collate,
+            collate_fn=self.data_collator,
         )
 
     def test_dataloader(self):
@@ -224,7 +202,7 @@ class Dataloader(pl.LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             num_workers=4,
-            collate_fn=default_collate,
+            collate_fn=self.data_collator,
         )
 
     def predict_dataloader(self):
@@ -232,5 +210,5 @@ class Dataloader(pl.LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             num_workers=4,
-            collate_fn=default_collate,
+            collate_fn=self.data_collator,
         )

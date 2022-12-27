@@ -4,6 +4,7 @@ import random
 
 import numpy as np
 import torch
+from datasets import DatasetDict, load_from_disk
 
 # manual
 from utils.logger import print_msg
@@ -40,7 +41,7 @@ def print_config(conf):
     print(f"BATCH SIZE    | {conf.batch_size}")
     print(f"MAX EPOCH     | {conf.max_epoch}")
     print(f"SHUFFLE       | {conf.shuffle}")
-    print(f"LEARNING RATE | {conf.lr}")
+    print(f"LEARNING RATE | {conf.learning_rate}")
     print(f"SEED          | {conf.seed}")
     print("=" * 60)
 
@@ -61,3 +62,8 @@ def setdir(dirpath, dirname=None, reset=True):
 def make_file_name(model_name, format, version="v0"):
     file_name = f"{model_name}_{version}.{format}"
     return file_name
+
+
+def load_data(dataset_path) -> DatasetDict:
+    raw_dataset = load_from_disk(dataset_path)
+    return raw_dataset

@@ -10,14 +10,14 @@ from utils import print_msg, set_seed, str2bool
 
 
 def execute_train(conf, version, is_monitor, is_scheduler):
-    import train
+    from train import train
 
     train(conf, version, is_monitor, is_scheduler)
     return
 
 
 def execute_inference(conf, version, model_path, is_checkpoint=False):
-    import inference
+    from inference import inference
 
     inference(conf, version, model_path, is_checkpoint)
     return
