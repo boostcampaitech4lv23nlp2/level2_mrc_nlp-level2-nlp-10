@@ -1,0 +1,32 @@
+program: train_gether.py
+entity: boost2end
+project: temp
+name: sweep
+
+method: random
+
+metric:
+  name: train_loss
+  goal: minimize
+
+parameters:
+  learning_rate:
+    max: 0.00001
+    min: 0.00000001
+  max_epoch:
+    value: 3
+  seed:
+    values: [42, 59, 100]
+  
+command:
+  - ${env}
+  - ${interpreter}
+  - ${program}
+  - "--output_dir"
+  - "outputs"
+  - "--do_train"
+  - "True"
+  - "--do_eval"
+  - "True"
+  - "--do_sweep"
+  - "True"

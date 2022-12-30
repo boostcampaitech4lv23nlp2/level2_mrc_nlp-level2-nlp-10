@@ -1,1 +1,8 @@
 omegaconf==2.2.3
+datasets==2.7.1
+faiss-gpu==1.7.2
+pip-chill==1.0.1
+scikit-learn==1.2.0
+torch==1.13.0
+transformers==4.25.1
+wandb==0.13.7
