@@ -27,7 +27,7 @@ class SparseRetrieval:
         tokenize_fn,
         data_path: Optional[str] = "../data/",
         context_path: Optional[str] = "wikipedia_documents.json",
-    ) -> NoReturn:
+    ):
 
         """
         Arguments:
@@ -353,18 +353,19 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--dataset_name", metavar="./data/train_dataset", type=str, help="")
+    parser.add_argument("--dataset_name", default="../data/train_dataset", type=str, help="")
     parser.add_argument(
         "--model_name_or_path",
-        metavar="bert-base-multilingual-cased",
+        default="klue/roberta-large",
         type=str,
         help="",
     )
-    parser.add_argument("--data_path", metavar="./data", type=str, help="")
-    parser.add_argument("--context_path", metavar="wikipedia_documents", type=str, help="")
-    parser.add_argument("--use_faiss", metavar=False, type=bool, help="")
+    parser.add_argument("--data_path", default="../data", type=str, help="")
+    parser.add_argument("--context_path", default="wikipedia_documents.json", type=str, help="")
+    parser.add_argument("--use_faiss", default=False, type=bool, help="")
 
     args = parser.parse_args()
+    print(args)
 
     # Test sparse
     org_dataset = load_from_disk(args.dataset_name)
