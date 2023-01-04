@@ -394,7 +394,7 @@ def main(args):
     else:
         with timer("bulk query by exhaustive search"):
             df = retriever.retrieve(full_ds, topk=args.topk)
-            # df["correct"] = df["original_context"] == df["context"]
+
             # original_context : ground_truth context / context : retrieve한 context
             df["correct"] = [original_context in context for original_context, context in zip(df["original_context"], df["context"])]
             print(
