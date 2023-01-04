@@ -393,8 +393,10 @@ def main(args):
 
     else:
         with timer("bulk query by exhaustive search"):
-            df = retriever.retrieve(full_ds)
-            df["correct"] = df["original_context"] == df["context"]
+            df = retriever.retrieve(full_ds, topk=args.topk)
+            # df["correct"] = df["original_context"] == df["context"]
+            # original_context : ground_truth context / context : retrieve한 context
+            df["correct"] = [original_context in context for original_context, context in zip(df["original_context"], df["context"])]
             print(
                 "correct retrieval result by exhaustive search",
                 df["correct"].sum() / len(df),
@@ -417,6 +419,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_path", default="../data", type=str, help="")
     parser.add_argument("--context_path", default="wikipedia_documents.json", type=str, help="")
     parser.add_argument("--use_faiss", default=False, type=bool, help="")
+    parser.add_argument("--topk", default=40, type=int, help="retrieve 할 문서 개수(topk) 설정")
 
     args = parser.parse_args()
     print(args)
