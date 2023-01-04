@@ -1,5 +1,6 @@
 from typing import List, NoReturn, Optional, Tuple, Union
 
+import argparse
 import json
 import os
 import pickle
@@ -12,6 +13,7 @@ import pandas as pd
 from datasets import Dataset, concatenate_datasets, load_from_disk
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm.auto import tqdm
+from transformers import AutoTokenizer
 
 
 @contextmanager
@@ -348,25 +350,7 @@ class SparseRetrieval:
         return D.tolist(), I.tolist()
 
 
-if __name__ == "__main__":
-
-    import argparse
-
-    parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--dataset_name", default="../data/train_dataset", type=str, help="")
-    parser.add_argument(
-        "--model_name_or_path",
-        default="klue/roberta-large",
-        type=str,
-        help="",
-    )
-    parser.add_argument("--data_path", default="../data", type=str, help="")
-    parser.add_argument("--context_path", default="wikipedia_documents.json", type=str, help="")
-    parser.add_argument("--use_faiss", default=False, type=bool, help="")
-
-    args = parser.parse_args()
-    print(args)
-
+def main(args):
     # Test sparse
     org_dataset = load_from_disk(args.dataset_name)
     full_ds = concatenate_datasets(
@@ -377,8 +361,8 @@ if __name__ == "__main__":
     )  # train dev 를 합친 4192 개 질문에 대해 모두 테스트
     print("*" * 40, "query dataset", "*" * 40)
     print(full_ds)
-
-    from transformers import AutoTokenizer
+    print(f"train: {len(org_dataset['train'])}")
+    print(f"validation: {len(org_dataset['validation'])}")
 
     tokenizer = AutoTokenizer.from_pretrained(
         args.model_name_or_path,
@@ -390,6 +374,7 @@ if __name__ == "__main__":
         data_path=args.data_path,
         context_path=args.context_path,
     )
+    retriever.get_sparse_embedding()
 
     query = "대통령을 포함한 미국의 행정부 견제권을 갖는 국가 기관은?"
 
@@ -417,3 +402,22 @@ if __name__ == "__main__":
 
         with timer("single query by exhaustive search"):
             scores, indices = retriever.retrieve(query)
+
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="")
+    parser.add_argument("--dataset_name", default="../data/train_dataset", type=str, help="")
+    parser.add_argument(
+        "--model_name_or_path",
+        default="klue/roberta-large",
+        type=str,
+        help="",
+    )
+    parser.add_argument("--data_path", default="../data", type=str, help="")
+    parser.add_argument("--context_path", default="wikipedia_documents.json", type=str, help="")
+    parser.add_argument("--use_faiss", default=False, type=bool, help="")
+
+    args = parser.parse_args()
+    print(args)
+    main(args)
