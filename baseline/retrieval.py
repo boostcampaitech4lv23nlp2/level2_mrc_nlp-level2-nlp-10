@@ -185,7 +185,7 @@ class SparseRetrieval:
                     "question": example["question"],
                     "id": example["id"],
                     # Retrieve한 Passage의 id, context를 반환합니다.
-                    "context_id": doc_indices[idx],
+                    # "context_id": doc_indices[idx],
                     "context": " ".join([self.contexts[pid] for pid in doc_indices[idx]]),
                 }
                 if "context" in example.keys() and "answers" in example.keys():
@@ -415,7 +415,7 @@ class BM25:
                     "question": example["question"],
                     "id": example["id"],
                     # Retrieve한 Passage의 id, context를 반환합니다.
-                    "context_id": doc_indices[idx],
+                    # "context_id": doc_indices[idx],
                     "context": " ".join([self.contexts[pid] for pid in doc_indices[idx]]),
                 }
                 if "context" in example.keys() and "answers" in example.keys():
