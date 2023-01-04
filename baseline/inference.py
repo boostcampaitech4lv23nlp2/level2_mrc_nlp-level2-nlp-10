@@ -40,6 +40,7 @@ def main():
 
     # dataset_name을 test_path로 바꿔줍니다.
     data_args.dataset_name = conf.others.test_path
+    data_args.top_k_retrieval = conf.dataset.top_k_retrieval
 
     training_args.do_train = True
 
