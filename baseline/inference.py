@@ -14,7 +14,7 @@ import numpy as np
 from arguments import DataTrainingArguments, ModelArguments
 from datasets import Dataset, DatasetDict, Features, Sequence, Value, load_from_disk, load_metric
 from omegaconf import OmegaConf
-from retrieval import SparseRetrieval, BM25
+from retrieval import BM25, SparseRetrieval
 from trainer_qa import QuestionAnsweringTrainer
 from transformers import (
     AutoConfig,

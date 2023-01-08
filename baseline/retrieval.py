@@ -7,11 +7,11 @@ import pickle
 import time
 from contextlib import contextmanager
 
-from rank_bm25 import BM25Okapi
 import faiss
 import numpy as np
 import pandas as pd
 from datasets import Dataset, concatenate_datasets, load_from_disk
+from rank_bm25 import BM25Okapi
 from sklearn.feature_extraction.text import TfidfVectorizer
 from tqdm.auto import tqdm
 from transformers import AutoTokenizer
@@ -353,7 +353,12 @@ class SparseRetrieval:
 
 
 class BM25:
-    def __init__(self, tokenize_fn, data_path: Optional[str] = "../data", context_path: Optional[str] = "wikipedia_documents.json"):
+    def __init__(
+        self,
+        tokenize_fn,
+        data_path: Optional[str] = "../data",
+        context_path: Optional[str] = "wikipedia_documents.json",
+    ):
         self.data_path = data_path
         with open(os.path.join(data_path, context_path), "r", encoding="utf-8") as f:
             wiki = json.load(f)
@@ -509,7 +514,9 @@ def main(args):
             df = retriever.retrieve(full_ds, topk=args.topk)
 
             # original_context : ground_truth context / context : retrieve한 context
-            df["correct"] = [original_context in context for original_context, context in zip(df["original_context"], df["context"])]
+            df["correct"] = [
+                original_context in context for original_context, context in zip(df["original_context"], df["context"])
+            ]
             print(
                 "correct retrieval result by exhaustive search",
                 df["correct"].sum() / len(df),

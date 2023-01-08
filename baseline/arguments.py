@@ -81,6 +81,4 @@ class DataTrainingArguments:
         metadata={"help": "Define how many top-k passages to retrieve based on similarity."},
     )
     use_faiss: bool = field(default=False, metadata={"help": "Whether to build with faiss"})
-    bm25: bool = field(
-        default=True, metadata={"help": "Whether to use BM25"}
-    )
+    bm25: bool = field(default=True, metadata={"help": "Whether to use BM25"})
