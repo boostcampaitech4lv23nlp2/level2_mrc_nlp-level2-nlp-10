@@ -14,7 +14,7 @@ import numpy as np
 from arguments import DataTrainingArguments, ModelArguments
 from datasets import Dataset, DatasetDict, Features, Sequence, Value, load_from_disk, load_metric
 from omegaconf import OmegaConf
-from retrieval import SparseRetrieval
+from retrieval import BM25, SparseRetrieval
 from trainer_qa import QuestionAnsweringTrainer
 from transformers import (
     AutoConfig,
@@ -40,8 +40,14 @@ def main():
 
     # dataset_name을 test_path로 바꿔줍니다.
     data_args.dataset_name = conf.others.test_path
+    data_args.top_k_retrieval = conf.dataset.top_k_retrieval
 
     training_args.do_train = True
+    print("#" * 30)
+    print("model_args: ", model_args)
+    print("data_args: ", data_args)
+    # print("training_args: ", training_args)
+    print("#" * 30)
 
     print(f"model is from {model_args.model_name_or_path}")
     print(f"data is from {data_args.dataset_name}")
@@ -101,7 +107,20 @@ def run_sparse_retrieval(
 ) -> DatasetDict:
 
     # Query에 맞는 Passage들을 Retrieval 합니다.
-    retriever = SparseRetrieval(tokenize_fn=tokenize_fn, data_path=data_path, context_path=context_path)
+    # BM25 사용
+    if data_args.bm25:
+        retriever = BM25(
+            tokenize_fn=tokenize_fn,
+            data_path=data_path,
+            context_path=context_path,
+        )
+    # TF-IDF 사용
+    else:
+        retriever = SparseRetrieval(
+            tokenize_fn=tokenize_fn,
+            data_path=data_path,
+            context_path=context_path,
+        )
     retriever.get_sparse_embedding()
 
     if data_args.use_faiss:
